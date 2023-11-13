@@ -5,7 +5,7 @@ import Alert from "./Alert";
 function App() {
   const [name, setName] = useState('')
   const [list, setList] = useState([])
-  const [isEditing, setEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [editID, setEditID] = useState(null)
   const [alert, setAlert] = useState({
     show: false, 
@@ -20,6 +20,18 @@ function App() {
       showAlert(true, 'danger', 'please enter value')
     } else if(name && isEditing){
       //deal with edit
+      setList(
+        list.map((item) => {
+          if(item.id === editID){
+            return {...item, title: name}
+          }
+          return item
+        })
+      )
+      setName('')
+      setEditID(null)
+      setIsEditing(false)
+      setAlert(true, 'success', 'value changed')
     } else {
       //show alert
       showAlert(true, 'success', 'item added to the list')
@@ -40,6 +52,12 @@ function App() {
     showAlert(true, 'danger', 'item remover')
     setList(list.filter((item) => item.id !== id))
   }
+  const editItem = (id) => {
+    const specificItem = list.find((item) => item.id === id)
+    setIsEditing(true)
+    setEditID(id)
+    setName(specificItem.title)
+  }
   return (
     <section className="section-center">
       <form className="grocery-form" onClick={handleSubmit}>
@@ -59,7 +77,11 @@ function App() {
       </form>
       {list.length > 0 && (
         <div className="grocery-container">
-          <List items={list} removeItem={removeItem} />
+          <List 
+            items={list} 
+            removeItem={removeItem} 
+            editItem={editItem}
+          />
           <button className="clear-btn" onClick={clearList}>clear items</button>
         </div>
       )}
